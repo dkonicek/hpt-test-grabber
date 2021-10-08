@@ -5,7 +5,7 @@
 
 namespace HPT\Models;
 
-use PHPHtmlParser\Dom\Node\HtmlNode;
+use PHPHtmlParser\Dom;
 
 /**
  *
@@ -15,14 +15,39 @@ class CzcProduct {
     /** @var string */
     private $code;
 
-    /** @var null|HtmlNode */
-    private $htmlNode = null;
+    /** @var Dom */
+    private $dom;
+
+    /** @var float */
+    private $price = 0;
 
     /**
      * @param string $code
+     * @param Dom $dom
+     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
+     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
      */
-    public function __construct(string $code) {
-        $this->setCode($code);
+    public function __construct(string $code, Dom $dom) {
+        $this->setParams($dom, $code);
+    }
+
+    /**
+     * @param Dom $dom
+     * @param string $productId
+     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
+     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
+     */
+    private function setParams(Dom $dom, string $productId): void {
+        $this->setDom($dom);
+        $this->setCode($productId);
+        $this->setPrice();
+    }
+
+    /**
+     * @param Dom $dom
+     */
+    private function setDom(Dom $dom): void {
+        $this->dom = $dom;
     }
 
     /**
@@ -33,6 +58,34 @@ class CzcProduct {
     }
 
     /**
+     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
+     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
+     */
+    private function setPrice(): void {
+        if (!$dom = $this->getDom()) {
+            return;
+        }
+
+        if (!$priceBlocks = $dom->find('span[class=price alone]')) {
+            return;
+        }
+
+        if (!$priceElement = $priceBlocks[0]->find('span[class=price-vatin]')) {
+            return;
+        }
+
+        $price = (string)($priceElement[0]->innerText() ?? 0);
+        $this->price = (float)str_replace(' ', '', $price);
+    }
+
+    /**
+     * @return Dom
+     */
+    public function getDom(): Dom {
+        return $this->dom;
+    }
+
+    /**
      * @return string
      */
     public function getCode(): string {
@@ -40,31 +93,9 @@ class CzcProduct {
     }
 
     /**
-     * @param HtmlNode|null $htmlNode
-     */
-    public function setHtmlNode(?HtmlNode $htmlNode): void {
-        $this->htmlNode = $htmlNode;
-    }
-
-    /**
      * @return float
      */
     public function getPrice(): float {
-        if ($node = $this->getHtmlNode()) {
-            foreach ($node->getAttributes() as $key => $val) {
-                if ($key === 'data-ga-impression') {
-                    $obj = json_decode($val);
-                    return (float)$obj->price;
-                }
-            }
-        }
-        return 0;
-    }
-
-    /**
-     * @return HtmlNode|null
-     */
-    private function getHtmlNode(): ?HtmlNode {
-        return $this->htmlNode;
+        return $this->price;
     }
 }
