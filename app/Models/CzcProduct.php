@@ -21,6 +21,12 @@ class CzcProduct {
     /** @var float */
     private $price = 0;
 
+    /** @var float */
+    private $rating = 0;
+
+    /** @var string */
+    private $name = '';
+
     /**
      * @param string $code
      * @param Dom $dom
@@ -41,6 +47,8 @@ class CzcProduct {
         $this->setDom($dom);
         $this->setCode($productId);
         $this->setPrice();
+        $this->setName();
+        $this->setRating();
     }
 
     /**
@@ -86,6 +94,48 @@ class CzcProduct {
     }
 
     /**
+     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
+     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
+     */
+    private function setName() {
+        if (!$dom = $this->getDom()) {
+            return;
+        }
+
+        if (!$wrappers = $dom->find('div[class=pd-wrap]')) {
+            return;
+        }
+
+        if (!$headlines = $wrappers[0]->find('h1')) {
+            return;
+        }
+
+        $name = trim($headlines[0]->innerText() ?? '');
+        $this->name = $name;
+    }
+
+    /**
+     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
+     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
+     */
+    private function setRating() {
+        if (!$dom = $this->getDom()) {
+            return;
+        }
+
+        if (!$ratingBlocks = $dom->find('div[class=pd-header]')) {
+            return;
+        }
+
+        if (!$ratingElements = $ratingBlocks[0]->find('span[class=rating__label]')) {
+            return;
+        }
+
+        $rating = (string)($ratingElements[0]->innerText() ?? 0);
+        $this->rating = (float)str_replace([' ', '%'], '', $rating);
+    }
+
+    /**
      * @return string
      */
     public function getCode(): string {
@@ -97,5 +147,19 @@ class CzcProduct {
      */
     public function getPrice(): float {
         return $this->price;
+    }
+
+    /**
+     * @return float
+     */
+    public function getRating() {
+        return $this->rating;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName(): string {
+        return $this->name;
     }
 }

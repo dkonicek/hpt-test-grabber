@@ -50,6 +50,38 @@ class CzcGrabber implements Grabber {
         return $this->getProduct($productId)->getPrice();
     }
 
+    /**
+     * @param string $productId
+     * @return string
+     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
+     * @throws \PHPHtmlParser\Exceptions\CircularException
+     * @throws \PHPHtmlParser\Exceptions\ContentLengthException
+     * @throws \PHPHtmlParser\Exceptions\LogicalException
+     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
+     * @throws \PHPHtmlParser\Exceptions\StrictException
+     * @throws \PHPHtmlParser\Exceptions\UnknownChildTypeException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function getName(string $productId): string {
+        return $this->getProduct($productId)->getName();
+    }
+
+    /**
+     * @param string $productId
+     * @return float
+     * @throws \PHPHtmlParser\Exceptions\ChildNotFoundException
+     * @throws \PHPHtmlParser\Exceptions\CircularException
+     * @throws \PHPHtmlParser\Exceptions\ContentLengthException
+     * @throws \PHPHtmlParser\Exceptions\LogicalException
+     * @throws \PHPHtmlParser\Exceptions\NotLoadedException
+     * @throws \PHPHtmlParser\Exceptions\StrictException
+     * @throws \PHPHtmlParser\Exceptions\UnknownChildTypeException
+     * @throws \Psr\Http\Client\ClientExceptionInterface
+     */
+    public function getRating(string $productId): float {
+        return $this->getProduct($productId)->getRating();
+    }
+
 
     /**
      * @param string $productId

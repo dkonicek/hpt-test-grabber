@@ -10,8 +10,7 @@ use Tracy\ILogger;
 /**
  *
  */
-class Dispatcher
-{
+class Dispatcher {
     /** @var Grabber */
     private $grabber;
 
@@ -22,8 +21,7 @@ class Dispatcher
      * @param Grabber $grabber
      * @param Output $output
      */
-    public function __construct(Grabber $grabber, Output $output)
-    {
+    public function __construct(Grabber $grabber, Output $output) {
         $this->grabber = $grabber;
         $this->output = $output;
     }
@@ -31,8 +29,7 @@ class Dispatcher
     /**
      * @return string JSON
      */
-    public function run(): string
-    {
+    public function run(): string {
         try {
             $codes = $this->loadCodes();
             $data = $this->processCodes($codes);
@@ -49,7 +46,7 @@ class Dispatcher
      */
     private function loadCodes(): array {
         $codes = file(__DIR__ . '/../vstup.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        if(!$codes){
+        if (!$codes) {
             throw new \ErrorException("File not exists or is empty!");
         }
         return $codes;
@@ -61,10 +58,12 @@ class Dispatcher
      */
     private function processCodes(array $codes): array {
         $data = [];
-        foreach ($codes as $code){
+        foreach ($codes as $code) {
             try {
                 $productParams = [
-                    'price' => $this->grabber->getPrice($code) ?: null
+                    'price'  => $this->grabber->getPrice($code) ?: null,
+                    'name'   => $this->grabber->getName($code),
+                    'rating' => $this->grabber->getRating($code)
                 ];
                 $data[$code] = $productParams;
             } catch (\InvalidArgumentException $e) {
