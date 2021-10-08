@@ -1,0 +1,9 @@
+parameters:
+    url:
+        czc: 'https://www.czc.cz/%s/hledat'
+
+services:
+    Dispatcher: HPT\Dispatcher
+
+    - HPT\Workers\CzcGrabber(%url.czc%)
+    - HPT\Utils\OutputGenerator
